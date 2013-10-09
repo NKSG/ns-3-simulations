@@ -1,0 +1,118 @@
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation;
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+*/
+
+#include <iostream>
+
+#include "ns3/log.h"
+#include "ns3/point-to-point-dumbbell.h"
+#include "ns3/constant-position-mobility-model.h"
+#include "ns3/node-list.h"
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/vector.h"
+#include "ns3/ipv6-address-generator.h"
+#include "ns3/core-module.h"
+#include "ns3/network-module.h"
+#include "ns3/internet-module.h"
+#include "ns3/point-to-point-module.h"
+#include "ns3/applications-module.h"
+
+using namespace ns3;
+
+int main (int argc, char *argv[])
+{
+  //Declarations of helpers
+  NodeContainer          m_leftLeaf;
+  NetDeviceContainer     m_leftLeafDevices;
+  NodeContainer          m_rightLeaf;
+  NetDeviceContainer     m_rightLeafDevices;
+  NodeContainer          m_routers;
+  NetDeviceContainer     m_routerDevices; // just two connecting the routers
+  NetDeviceContainer     m_leftRouterDevices;
+  NetDeviceContainer     m_rightRouterDevices;
+
+  // IP Containers
+  Ipv4InterfaceContainer m_leftLeafInterfaces;
+  Ipv4InterfaceContainer m_leftRouterInterfaces;
+  Ipv4InterfaceContainer m_rightLeafInterfaces;
+  Ipv4InterfaceContainer m_rightRouterInterfaces;
+  Ipv4InterfaceContainer m_routerInterfaces;
+  Ipv6InterfaceContainer m_leftLeafInterfaces6;
+  Ipv6InterfaceContainer m_leftRouterInterfaces6;
+  Ipv6InterfaceContainer m_rightLeafInterfaces6;
+  Ipv6InterfaceContainer m_rightRouterInterfaces6;
+  Ipv6InterfaceContainer m_routerInterfaces6;
+
+  //Point to Point helpers
+  PointToPointHelper longFlowPtP;
+  PointToPointHelper shortFlowPtP;
+  PointToPointHelper pointToPointBottleneck;
+  pointToPointBottleneck.SetDeviceAttribute  ("DataRate", StringValue ("10Mbps"));
+  pointToPointBottleneck.SetChannelAttribute ("Delay", StringValue ("10ms"));
+  longFlowPtP.setDeviceAttribute ("DataRate", StringValue ("100Mbps"));
+  shortFlowPtP.setDeviceAttribute ("DataRate", StringValue ("100Mbps"));
+  longFlowPtP.setChannelAttribute ("Delay", StringValue ("50ms"));
+  shortFlowPtP.setChannelAttribute ("Delay", StringValue ("5ms"));
+
+  // Create bottleneck routers
+  m_routers.Create (2);
+
+  // Create the leaf nodes
+  m_leftLeaf.Create (6);
+  m_rightLeaf.Create (6);
+
+  // Left long links
+  for (uint32_t i = 0; i < 3; ++i)
+    {
+      NetDeviceContainer c = longFlowPtP.Install (m_routers.Get (0),
+                                                 m_leftLeaf.Get (i));
+      m_leftRouterDevices.Add (c.Get (0));
+      m_leftLeafDevices.Add (c.Get (1));
+    }
+
+  // Left short links
+  for (uint32_t i = 3; i < 6; ++i)
+    {
+      NetDeviceContainer c = shortFlowPtP.Install (m_routers.Get (0),
+                                                 m_leftLeaf.Get (i));
+      m_leftRouterDevices.Add (c.Get (0));
+      m_leftLeafDevices.Add (c.Get (1));
+    }
+
+  // Right long links
+  for (uint32_t i = 0; i < 3; ++i)
+    {
+      NetDeviceContainer c = longFlowPtP.Install (m_routers.Get (1),
+                                                  m_rightLeaf.Get (i));
+      m_rightRouterDevices.Add (c.Get (0));
+      m_rightLeafDevices.Add (c.Get (1));
+    }
+  // Right short links
+  for (uint32_t i = 3; i < 6; ++i)
+    {
+      NetDeviceContainer c = longFlowPtP.Install (m_routers.Get (1),
+                                                  m_rightLeaf.Get (i));
+      m_rightRouterDevices.Add (c.Get (0));
+      m_rightLeafDevices.Add (c.Get (1));
+    }
+
+  // Install Stack
+  InternetStackHelper stack;
+  stack.Install (m_routers);
+  stack.Install (m_leftLeaf);
+  stack.Install (m_rightLeaf);
+  return 0;
+}
