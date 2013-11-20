@@ -69,8 +69,8 @@ int main (int argc, char *argv[])
   longFlowPtP.SetChannelAttribute ("Delay", StringValue ("50ms"));
   shortFlowPtP.SetChannelAttribute ("Delay", StringValue ("5ms"));
 
-  uint32_t LeftCount = 6;
-  uint32_t RightCount = 6;
+  uint32_t LeftCount = 20;
+  uint32_t RightCount = 20;
 
   // Create bottleneck routers
   m_routers.Create (2);
@@ -80,7 +80,7 @@ int main (int argc, char *argv[])
   m_rightLeaf.Create (RightCount);
 
   // Left long links
-  for (uint32_t i = 0; i < 3; ++i)
+  for (uint32_t i = 0; i < 10; ++i)
     {
       NetDeviceContainer c = longFlowPtP.Install (m_routers.Get (0),
                                                  m_leftLeaf.Get (i));
@@ -92,7 +92,7 @@ int main (int argc, char *argv[])
     }
 
   // Left short links
-  for (uint32_t i = 3; i < 6; ++i)
+  for (uint32_t i = 10; i < 20; ++i)
     {
       NetDeviceContainer c = shortFlowPtP.Install (m_routers.Get (0),
                                                  m_leftLeaf.Get (i));
@@ -101,7 +101,7 @@ int main (int argc, char *argv[])
     }
 
   // Right long links
-  for (uint32_t i = 0; i < 3; ++i)
+  for (uint32_t i = 0; i < 10; ++i)
     {
       NetDeviceContainer c = longFlowPtP.Install (m_routers.Get (1),
                                                   m_rightLeaf.Get (i));
@@ -109,7 +109,7 @@ int main (int argc, char *argv[])
       m_rightLeafDevices.Add (c.Get (1));
     }
   // Right short links
-  for (uint32_t i = 3; i < 6; ++i)
+  for (uint32_t i = 10; i < 20; ++i)
     {
       NetDeviceContainer c = longFlowPtP.Install (m_routers.Get (1),
                                                   m_rightLeaf.Get (i));

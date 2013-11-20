@@ -10,3 +10,12 @@ Next, copy the above code into the
 `scratch` 
 directory located in 
 `ns-3-dev`
+
+### Information about the project
+
+What is this project about? Find out by [visiting my site](http://tcpduality.web.unc.edu).
+
+### Contact us
+
+Author: James Martin (jamesml@cs.unc.edu)
+Advisor: Ketan Mayer-Patel (kmp@cs.unc.edu)
