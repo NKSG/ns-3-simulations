@@ -87,8 +87,8 @@ int main (int argc, char *argv[])
       m_leftRouterDevices.Add (c.Get (0));
       m_leftLeafDevices.Add (c.Get (1));
 
-      NS_LOG_INFO("The ")
-      NS_LOG_INFO(m_leftLeaf.Get(i))
+      NS_LOG_INFO("The ");
+      NS_LOG_INFO(m_leftLeaf.Get(i));
     }
 
   // Left short links
@@ -166,9 +166,47 @@ int main (int argc, char *argv[])
       clientHelper.SetAttribute ("Remote", remoteAddress);
       clientApps.Add (clientHelper.Install (m_rightLeaf.Get (i)));
     }
+  std::string probeName = "ns3::Ipv4PacketProbe";    
+  std::string probeTrace = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
+  GnuplotHelper plotHelper;
+
+  // Configure the plot.  The first argument is the file name prefix
+  // for the output files generated.  The second, third, and fourth
+  // arguments are, respectively, the plot title, x-axis, and y-axis labels
+  plotHelper.ConfigurePlot ("dumbbell-packet",
+                            "Packet Byte Count vs. Time",
+                            "Time (Seconds)",
+                            "Packet Byte Count");
+
+  // Specify the probe type, probe path (in configuration namespace), and
+  // probe output trace source ("OutputBytes") to plot.  The fourth argument
+  // specifies the name of the data series label on the plot.  The last
+  // argument formats the plot by specifying where the key should be placed.
+  plotHelper.PlotProbe (probeName,
+                        probeTrace,
+                        "OutputBytes",
+                        "Packet Byte Count",
+                        GnuplotAggregator::KEY_BELOW);
+
+  // Use FileHelper to write out the packet byte count over time
+  FileHelper fileHelper;
+
+  // Configure the file to be written, and the formatting of output data.
+  fileHelper.ConfigureFile ("seventh-packet-byte-count",
+                            FileAggregator::FORMATTED);
+
+  // Set the labels for this formatted output file.
+  fileHelper.Set2dFormat ("Time (Seconds) = %.3e\tPacket Byte Count = %.0f");
+
+  // Specify the probe type, probe path (in configuration namespace), and
+  // probe output trace source ("OutputBytes") to write.
+  fileHelper.WriteProbe (probeName,
+                         probeTrace,
+                         "OutputBytes");
 
   clientApps.Start (Seconds (0.0));
   clientApps.Stop (Seconds (10.0));
+  
 
   //Run simulation
   //
