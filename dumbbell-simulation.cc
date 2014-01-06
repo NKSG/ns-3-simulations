@@ -13,6 +13,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
+ * This simulation was created by James Martin, Undergrad at UNC-CH.
+ * For more information about this simulation, visit:
+ * tcpduality.web.unc.edu
 */
 
 #include <cmath>
@@ -158,14 +161,18 @@ int main (int argc, char *argv[])
   clientHelper.SetAttribute ("OffTime", StringValue ("ns3::UniformRandomVariable"));
   ApplicationContainer clientApps;
 
-  for (uint32_t i = 0; i < RightCount; ++i)
+  for (uint32_t i = 0; i < LeftCount; ++i)
     {
-      // Create an on/off app sending packets to the same leaf right side
+      // Create an on/off app sending packets to the same leaf left side
       AddressValue remoteAddress (InetSocketAddress (m_leftLeafInterfaces.GetAddress (i), 1000));
       clientHelper.SetAttribute ("Remote", remoteAddress);
-      clientApps.Add (clientHelper.Install (m_rightLeaf.Get (i)));
+      clientApps.Add (clientHelper.Install (m_leftLeaf.Get (i)));
     }
-    
+  
+  for (uint32_t i = 0; i < RightCount; i++)
+    {
+      //Create packet sinks on the right side
+    }
   // std::string probeName = "ns3::Ipv4PacketProbe";    
   // std::string probeTrace = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
   // GnuplotHelper plotHelper;
