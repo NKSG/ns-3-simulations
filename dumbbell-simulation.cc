@@ -32,6 +32,8 @@
 #include "ns3/applications-module.h"
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
+#include "ns3/stats-module.h"
+
 
 NS_LOG_COMPONENT_DEFINE ("DumbbellSimulation");
 
@@ -166,6 +168,7 @@ int main (int argc, char *argv[])
       clientHelper.SetAttribute ("Remote", remoteAddress);
       clientApps.Add (clientHelper.Install (m_rightLeaf.Get (i)));
     }
+    
   std::string probeName = "ns3::Ipv4PacketProbe";    
   std::string probeTrace = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
   GnuplotHelper plotHelper;
