@@ -1,223 +1,130 @@
-/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
-/*
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation;
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
-
-#include <fstream>
+#include "ns3/simulator-module.h"
+#include "ns3/node-module.h"
 #include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/point-to-point-module.h"
-#include "ns3/applications-module.h"
+#include "ns3/common-module.h"
+#include "ns3/global-route-manager.h"
+#include "ns3/helper-module.h"
+#include "ns3/bridge-module.h"
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("FifthScriptExample");
-
-// ===========================================================================
-//
-//         node 0                 node 1
-//   +----------------+    +----------------+
-//   |    ns-3 TCP    |    |    ns-3 TCP    |
-//   +----------------+    +----------------+
-//   |    10.1.1.1    |    |    10.1.1.2    |
-//   +----------------+    +----------------+
-//   | point-to-point |    | point-to-point |
-//   +----------------+    +----------------+
-//           |                     |
-//           +---------------------+
-//                5 Mbps, 2 ms
-//
-//
-// We want to look at changes in the ns-3 TCP congestion window.  We need
-// to crank up a flow and hook the CongestionWindow attribute on the socket
-// of the sender.  Normally one would use an on-off application to generate a
-// flow, but this has a couple of problems.  First, the socket of the on-off 
-// application is not created until Application Start time, so we wouldn't be 
-// able to hook the socket (now) at configuration time.  Second, even if we 
-// could arrange a call after start time, the socket is not public so we 
-// couldn't get at it.
-//
-// So, we can cook up a simple version of the on-off application that does what
-// we want.  On the plus side we don't need all of the complexity of the on-off
-// application.  On the minus side, we don't have a helper, so we have to get
-// a little more involved in the details, but this is trivial.
-//
-// So first, we create a socket and do the trace connect on it; then we pass 
-// this socket into the constructor of our simple application which we then 
-// install in the source node.
-// ===========================================================================
-//
-class MyApp : public Application 
+int main(int argc, char *argv[])
 {
-public:
+  CommandLine cmd;
+  cmd.Parse (argc, argv);
 
-  MyApp ();
-  virtual ~MyApp();
+  /* Configuration. */
 
-  void Setup (Ptr<Socket> socket, Address address, uint32_t packetSize, uint32_t nPackets, DataRate dataRate);
+  /* Build nodes. */
+  NodeContainer router_0;
+  router_0.Create (1);
+  NodeContainer router_1;
+  router_1.Create (1);
+  NodeContainer term_0;
+  term_0.Create (1);
+  NodeContainer term_1;
+  term_1.Create (1);
+  NodeContainer term_2;
+  term_2.Create (1);
+  NodeContainer term_3;
+  term_3.Create (1);
+  NodeContainer term_4;
+  term_4.Create (1);
+  NodeContainer term_5;
+  term_5.Create (1);
 
-private:
-  virtual void StartApplication (void);
-  virtual void StopApplication (void);
+  /* Build link. */
+  CsmaHelper csma_hub_0;
+  csma_hub_0.SetChannelAttribute ("DataRate", DataRateValue (100000000));
+  csma_hub_0.SetChannelAttribute ("Delay",  TimeValue (MilliSeconds (10000)));
+  CsmaHelper csma_hub_1;
+  csma_hub_1.SetChannelAttribute ("DataRate", DataRateValue (100000000));
+  csma_hub_1.SetChannelAttribute ("Delay",  TimeValue (MilliSeconds (10000)));
+  CsmaHelper csma_hub_2;
+  csma_hub_2.SetChannelAttribute ("DataRate", DataRateValue (100000000));
+  csma_hub_2.SetChannelAttribute ("Delay",  TimeValue (MilliSeconds (10000)));
+  CsmaHelper csma_hub_3;
+  csma_hub_3.SetChannelAttribute ("DataRate", DataRateValue (100000000));
+  csma_hub_3.SetChannelAttribute ("Delay",  TimeValue (MilliSeconds (10000)));
+  CsmaHelper csma_hub_4;
+  csma_hub_4.SetChannelAttribute ("DataRate", DataRateValue (100000000));
+  csma_hub_4.SetChannelAttribute ("Delay",  TimeValue (MilliSeconds (10000)));
+  CsmaHelper csma_hub_5;
+  csma_hub_5.SetChannelAttribute ("DataRate", DataRateValue (100000000));
+  csma_hub_5.SetChannelAttribute ("Delay",  TimeValue (MilliSeconds (10000)));
+  CsmaHelper csma_hub_6;
+  csma_hub_6.SetChannelAttribute ("DataRate", DataRateValue (100000000));
+  csma_hub_6.SetChannelAttribute ("Delay",  TimeValue (MilliSeconds (10000)));
 
-  void ScheduleTx (void);
-  void SendPacket (void);
+  /* Build link net device container. */
+  NodeContainer all_hub_0;
+  all_hub_0.Add (router_1);
+  all_hub_0.Add (router_0);
+  NetDeviceContainer ndc_hub_0 = csma_hub_0.Install (all_hub_0);
+  NodeContainer all_hub_1;
+  all_hub_1.Add (router_0);
+  all_hub_1.Add (term_0);
+  NetDeviceContainer ndc_hub_1 = csma_hub_1.Install (all_hub_1);
+  NodeContainer all_hub_2;
+  all_hub_2.Add (router_0);
+  all_hub_2.Add (term_2);
+  NetDeviceContainer ndc_hub_2 = csma_hub_2.Install (all_hub_2);
+  NodeContainer all_hub_3;
+  all_hub_3.Add (router_0);
+  all_hub_3.Add (term_1);
+  NetDeviceContainer ndc_hub_3 = csma_hub_3.Install (all_hub_3);
+  NodeContainer all_hub_4;
+  all_hub_4.Add (router_1);
+  all_hub_4.Add (term_5);
+  NetDeviceContainer ndc_hub_4 = csma_hub_4.Install (all_hub_4);
+  NodeContainer all_hub_5;
+  all_hub_5.Add (router_1);
+  all_hub_5.Add (term_4);
+  NetDeviceContainer ndc_hub_5 = csma_hub_5.Install (all_hub_5);
+  NodeContainer all_hub_6;
+  all_hub_6.Add (router_1);
+  all_hub_6.Add (term_3);
+  NetDeviceContainer ndc_hub_6 = csma_hub_6.Install (all_hub_6);
 
-  Ptr<Socket>     m_socket;
-  Address         m_peer;
-  uint32_t        m_packetSize;
-  uint32_t        m_nPackets;
-  DataRate        m_dataRate;
-  EventId         m_sendEvent;
-  bool            m_running;
-  uint32_t        m_packetsSent;
-};
+  /* Install the IP stack. */
+  InternetStackHelper internetStackH;
+  internetStackH.Install (router_0);
+  internetStackH.Install (router_1);
+  internetStackH.Install (term_0);
+  internetStackH.Install (term_1);
+  internetStackH.Install (term_2);
+  internetStackH.Install (term_3);
+  internetStackH.Install (term_4);
+  internetStackH.Install (term_5);
 
-MyApp::MyApp ()
-  : m_socket (0), 
-    m_peer (), 
-    m_packetSize (0), 
-    m_nPackets (0), 
-    m_dataRate (0), 
-    m_sendEvent (), 
-    m_running (false), 
-    m_packetsSent (0)
-{
-}
+  /* IP assign. */
+  Ipv4AddressHelper ipv4;
+  ipv4.SetBase ("10.0.0.0", "255.255.255.0");
+  Ipv4InterfaceContainer iface_ndc_hub_0 = ipv4.Assign (ndc_hub_0);
+  ipv4.SetBase ("10.0.1.0", "255.255.255.0");
+  Ipv4InterfaceContainer iface_ndc_hub_1 = ipv4.Assign (ndc_hub_1);
+  ipv4.SetBase ("10.0.2.0", "255.255.255.0");
+  Ipv4InterfaceContainer iface_ndc_hub_2 = ipv4.Assign (ndc_hub_2);
+  ipv4.SetBase ("10.0.3.0", "255.255.255.0");
+  Ipv4InterfaceContainer iface_ndc_hub_3 = ipv4.Assign (ndc_hub_3);
+  ipv4.SetBase ("10.0.4.0", "255.255.255.0");
+  Ipv4InterfaceContainer iface_ndc_hub_4 = ipv4.Assign (ndc_hub_4);
+  ipv4.SetBase ("10.0.5.0", "255.255.255.0");
+  Ipv4InterfaceContainer iface_ndc_hub_5 = ipv4.Assign (ndc_hub_5);
+  ipv4.SetBase ("10.0.6.0", "255.255.255.0");
+  Ipv4InterfaceContainer iface_ndc_hub_6 = ipv4.Assign (ndc_hub_6);
 
-MyApp::~MyApp()
-{
-  m_socket = 0;
-}
+  /* Generate Route. */
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
-void
-MyApp::Setup (Ptr<Socket> socket, Address address, uint32_t packetSize, uint32_t nPackets, DataRate dataRate)
-{
-  m_socket = socket;
-  m_peer = address;
-  m_packetSize = packetSize;
-  m_nPackets = nPackets;
-  m_dataRate = dataRate;
-}
+  /* Generate Application. */
 
-void
-MyApp::StartApplication (void)
-{
-  m_running = true;
-  m_packetsSent = 0;
-  m_socket->Bind ();
-  m_socket->Connect (m_peer);
-  SendPacket ();
-}
-
-void 
-MyApp::StopApplication (void)
-{
-  m_running = false;
-
-  if (m_sendEvent.IsRunning ())
-    {
-      Simulator::Cancel (m_sendEvent);
-    }
-
-  if (m_socket)
-    {
-      m_socket->Close ();
-    }
-}
-
-void 
-MyApp::SendPacket (void)
-{
-  Ptr<Packet> packet = Create<Packet> (m_packetSize);
-  m_socket->Send (packet);
-
-  if (++m_packetsSent < m_nPackets)
-    {
-      ScheduleTx ();
-    }
-}
-
-void 
-MyApp::ScheduleTx (void)
-{
-  if (m_running)
-    {
-      Time tNext (Seconds (m_packetSize * 8 / static_cast<double> (m_dataRate.GetBitRate ())));
-      m_sendEvent = Simulator::Schedule (tNext, &MyApp::SendPacket, this);
-    }
-}
-
-static void
-CwndChange (uint32_t oldCwnd, uint32_t newCwnd)
-{
-  NS_LOG_UNCOND (Simulator::Now ().GetSeconds () << "\t" << newCwnd);
-}
-
-static void
-RxDrop (Ptr<const Packet> p)
-{
-  NS_LOG_UNCOND ("RxDrop at " << Simulator::Now ().GetSeconds ());
-}
-
-int 
-main (int argc, char *argv[])
-{
-  NodeContainer nodes;
-  nodes.Create (2);
-
-  PointToPointHelper pointToPoint;
-  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
-
-  NetDeviceContainer devices;
-  devices = pointToPoint.Install (nodes);
-
-  Ptr<RateErrorModel> em = CreateObject<RateErrorModel> ();
-  em->SetAttribute ("ErrorRate", DoubleValue (0.00001));
-  devices.Get (1)->SetAttribute ("ReceiveErrorModel", PointerValue (em));
-
-  InternetStackHelper stack;
-  stack.Install (nodes);
-
-  Ipv4AddressHelper address;
-  address.SetBase ("10.1.1.0", "255.255.255.252");
-  Ipv4InterfaceContainer interfaces = address.Assign (devices);
-
-  uint16_t sinkPort = 8080;
-  Address sinkAddress (InetSocketAddress (interfaces.GetAddress (1), sinkPort));
-  PacketSinkHelper packetSinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
-  ApplicationContainer sinkApps = packetSinkHelper.Install (nodes.Get (1));
-  sinkApps.Start (Seconds (0.));
-  sinkApps.Stop (Seconds (20.));
-
-  Ptr<Socket> ns3TcpSocket = Socket::CreateSocket (nodes.Get (0), TcpSocketFactory::GetTypeId ());
-  ns3TcpSocket->TraceConnectWithoutContext ("CongestionWindow", MakeCallback (&CwndChange));
-
-  Ptr<MyApp> app = CreateObject<MyApp> ();
-  app->Setup (ns3TcpSocket, sinkAddress, 1040, 1000, DataRate ("1Mbps"));
-  nodes.Get (0)->AddApplication (app);
-  app->SetStartTime (Seconds (1.));
-  app->SetStopTime (Seconds (20.));
-
-  devices.Get (1)->TraceConnectWithoutContext ("PhyRxDrop", MakeCallback (&RxDrop));
-
-  Simulator::Stop (Seconds (20));
+  /* Simulation. */
+  /* Pcap output. */
+  /* Stop the simulation after x seconds. */
+  uint32_t stopTime = 1;
+  Simulator::Stop (Seconds (stopTime));
+  /* Start and clean simulation. */
   Simulator::Run ();
   Simulator::Destroy ();
-
-  return 0;
 }
-
