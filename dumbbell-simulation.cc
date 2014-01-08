@@ -154,7 +154,7 @@ int main (int argc, char *argv[])
       rightIp.NewNetwork ();
     }
 
-  NS_LOG_INFO("Setting up simulation!");
+  NS_LOG_INFO("Setting up client applications and destination packet sinks.");
   //Set up simulation
   OnOffHelper clientHelper ("ns3::TcpSocketFactory", Address ());
   clientHelper.SetAttribute ("OnTime", StringValue ("ns3::UniformRandomVariable"));
@@ -168,11 +168,17 @@ int main (int argc, char *argv[])
       clientHelper.SetAttribute ("Remote", remoteAddress);
       clientApps.Add (clientHelper.Install (m_leftLeaf.Get (i)));
     }
-  
+
+  uint16_t sinkPort = 8080;
+  PacketSinkHelper packetSinkHelper ("ns3::TcpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
+  ApplicationContainer sinkApps;
+
   for (uint32_t i = 0; i < RightCount; i++)
     {
       //Create packet sinks on the right side
-    }
+      Address sinkAddress (InetSocketAddress (m_rightLeafInterfaces.GetAddress (i), sinkPort));
+      sinkApps = packetSinkHelper.Install (m_rightLeaf.Get (i));
+     }
   // std::string probeName = "ns3::Ipv4PacketProbe";    
   // std::string probeTrace = "/NodeList/*/$ns3::Ipv4L3Protocol/Tx";
   // GnuplotHelper plotHelper;

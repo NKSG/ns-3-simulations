@@ -214,7 +214,7 @@ main (int argc, char *argv[])
 
   devices.Get (1)->TraceConnectWithoutContext ("PhyRxDrop", MakeCallback (&RxDrop));
 
-  Simulator::Stop (Seconds (20));
+  Simulator::Stop (Seconds (30));
   Simulator::Run ();
   Simulator::Destroy ();
 
